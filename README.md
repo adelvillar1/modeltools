@@ -1,64 +1,61 @@
-# Document Vision MCP Server
+# ModelTools MCP Server
 
-An MCP (Model Context Protocol) server that provides document conversion and vision analysis capabilities. Works with any model that supports tool calling — Claude, GPT-4, Kimi, etc.
+A comprehensive [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server providing 18+ tools for AI coding assistants. Works with any model that supports tool calling — Claude, GPT-4, Kimi, and more.
 
 ## Features
 
-- **📄 Document Conversion**: Extract text from PDF, DOCX, XLSX/XLS files, or render PDF pages as images
-- **✍️ Document Creation**: Create PDFs, Word docs, Excel spreadsheets, and HTML presentations
-- **👁️ Vision Analysis**: Send images to vision-capable models (Claude Haiku/Sonnet, Kimi K2.5) for analysis
-- **📁 File System**: Read, write, list, and search files and directories
-- **🔍 Code & Git**: Search code, check git status, view diffs and logs
-- **⚡ Shell & Web**: Execute commands and fetch web content safely
-- **🔧 Universal**: Any model with tool support can call these tools
-- **🐳 Docker-ready**: Pre-built image with all native dependencies
+- **📄 Document Conversion** — Extract text or render PDF/DOCX/XLSX/TXT files as images
+- **✍️ Document Creation** — Generate PDFs, Word docs, Excel spreadsheets, and HTML presentations
+- **👁️ Vision Analysis** — Send images to Claude or Kimi for analysis
+- **📁 File Operations** — Read, write, list, and search files and directories
+- **🔍 Code & Git Tools** — Search code with glob patterns, check git status, view diffs and logs
+- **⚡ Execution & Web** — Run shell commands with safety guards and fetch web content
+- **🔧 Universal** — Any model with tool support can use these tools
+- **🐳 Docker Ready** — Pre-built image with all native dependencies
+
+---
 
 ## Quick Start
 
 ### Using Docker (Recommended)
 
 ```bash
-# Run with Anthropic API key only (Claude models)
+# Run with Anthropic API key (for vision analysis)
 docker run -i --rm \
   -e ANTHROPIC_API_KEY=your_key_here \
-  ghcr.io/adelvillar/document-vision-mcp:latest
+  ghcr.io/adelvillar/modeltools:latest
 
-# Run with Ollama support (Kimi models) - requires API key for ollama.com
+# Run with Ollama support (for Kimi models)
 docker run -i --rm \
   -e OLLAMA_HOST=https://ollama.com \
   -e OLLAMA_API_KEY=your_key_here \
-  ghcr.io/adelvillar/document-vision-mcp:latest
+  ghcr.io/adelvillar/modeltools:latest
 
-# Run with both (recommended)
+# Run with both providers
 docker run -i --rm \
   -e ANTHROPIC_API_KEY=your_key_here \
   -e OLLAMA_HOST=https://ollama.com \
   -e OLLAMA_API_KEY=your_key_here \
-  ghcr.io/adelvillar/document-vision-mcp:latest
-
-# Self-hosted Ollama (no API key needed)
-docker run -i --rm \
-  -e OLLAMA_HOST=http://host.docker.internal:11434 \
-  ghcr.io/adelvillar/document-vision-mcp:latest
+  ghcr.io/adelvillar/modeltools:latest
 ```
 
 ### Using npm
 
 ```bash
-npm install -g @adelvillar/document-vision-mcp
+npm install -g @adelvillar/modeltools
 
 # Set environment variables
 export ANTHROPIC_API_KEY=your_key_here
 
 # Run
-ocument-vision-mcp
+modeltools
 ```
 
 ### Building from Source
 
 ```bash
-git clone https://github.com/adelvillar/document-vision-mcp.git
-cd document-vision-mcp
+git clone https://github.com/adelvillar1/modeltools.git
+cd modeltools
 npm install
 npm run build
 
@@ -67,15 +64,17 @@ export ANTHROPIC_API_KEY=your_key_here
 node ./dist/index.js
 ```
 
+---
+
 ## Configuration
 
 ### Environment Variables
 
 | Variable | Required For | Description |
 |----------|--------------|-------------|
-| `ANTHROPIC_API_KEY` | Claude models | Anthropic API key ([get one](https://console.anthropic.com/)) |
-| `OLLAMA_HOST` | Ollama models | Ollama server URL |
-| `OLLAMA_API_KEY` | Ollama cloud | Required for `ollama.com` cloud models (optional for self-hosted) |
+| `ANTHROPIC_API_KEY` | Claude models | [Anthropic API key](https://console.anthropic.com/) |
+| `OLLAMA_HOST` | Ollama models | Ollama server URL (e.g., `https://ollama.com`) |
+| `OLLAMA_API_KEY` | Ollama cloud | Required for `ollama.com` cloud models |
 
 At least one provider must be configured for vision analysis to work.
 
@@ -83,74 +82,31 @@ At least one provider must be configured for vision analysis to work.
 
 **Ollama.com Cloud (recommended for Kimi K2.5):**
 ```bash
-# Get your API key from https://ollama.com/settings/api
 export OLLAMA_HOST="https://ollama.com"
 export OLLAMA_API_KEY="your-key-here"
 ```
 
 **Self-hosted Ollama (local):**
 ```bash
-# No API key needed for local instances
 export OLLAMA_HOST="http://localhost:11434"
-# OLLAMA_API_KEY can be omitted
+# No API key needed for local instances
 ```
 
 ### Claude Code Configuration
 
 Add to `.claude/mcp.json` (or your project's MCP config):
 
-**Using Anthropic (Claude) models:**
 ```json
 {
   "servers": {
-    "document-vision": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "ANTHROPIC_API_KEY",
-        "ghcr.io/adelvillar/document-vision-mcp:latest"
-      ],
-      "env": {
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
-      }
-    }
-  }
-}
-```
-
-**Using Ollama (Kimi) models:**
-```json
-{
-  "servers": {
-    "document-vision": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-e", "OLLAMA_HOST",
-        "-e", "OLLAMA_API_KEY",
-        "ghcr.io/adelvillar/document-vision-mcp:latest"
-      ],
-      "env": {
-        "OLLAMA_HOST": "https://ollama.com",
-        "OLLAMA_API_KEY": "${OLLAMA_API_KEY}"
-      }
-    }
-  }
-}
-```
-
-**Using both (recommended for flexibility):**
-```json
-{
-  "servers": {
-    "document-vision": {
+    "modeltools": {
       "command": "docker",
       "args": [
         "run", "-i", "--rm",
         "-e", "ANTHROPIC_API_KEY",
         "-e", "OLLAMA_HOST",
         "-e", "OLLAMA_API_KEY",
-        "ghcr.io/adelvillar/document-vision-mcp:latest"
+        "ghcr.io/adelvillar/modeltools:latest"
       ],
       "env": {
         "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
@@ -167,9 +123,9 @@ Or use the npm package directly:
 ```json
 {
   "servers": {
-    "document-vision": {
+    "modeltools": {
       "command": "npx",
-      "args": ["-y", "@adelvillar/document-vision-mcp"],
+      "args": ["-y", "@adelvillar/modeltools"],
       "env": {
         "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
       }
@@ -178,27 +134,32 @@ Or use the npm package directly:
 }
 ```
 
-## Tools
+---
 
-### `document/convert`
+## Tools Reference
 
-Convert documents to text or render them as images.
+### Document Conversion
+
+#### `document/convert`
+
+Extract text from documents or render PDF pages as images.
 
 **Input:**
 ```json
 {
   "file": "/path/to/document.pdf",
-  "operation": "text" // or "images"
+  "operation": "text"
 }
 ```
 
-**Operations:**
-- `text`: Extract plain text (PDF, DOCX, XLSX, TXT)
-- `images`: Render PDF pages as base64 PNG images
+**Parameters:**
+- `file` (string, required) — File path or base64 data URL
+- `operation` (enum: `"text"` | `"images"`, required) — Extract text or render as images
+- `pages` (number[], optional) — Specific page indices (0-indexed), default: all pages
 
 **Examples:**
 
-Extract text from a DOCX file:
+Extract text from a DOCX:
 ```json
 {
   "file": "./report.docx",
@@ -206,32 +167,47 @@ Extract text from a DOCX file:
 }
 ```
 
-Convert PDF pages to images:
+Render PDF pages to images:
 ```json
 {
   "file": "./document.pdf",
   "operation": "images",
-  "pages": [0, 1, 2] // Optional: specific pages (0-indexed)
+  "pages": [0, 1, 2]
 }
 ```
 
-### `vision/analyze`
+**Supported formats:**
+- PDF (text extraction and image rendering)
+- DOCX/DOC (text extraction)
+- XLSX/XLS (converted to CSV per sheet)
+- TXT/MD (plain text)
 
-Send images to a vision-capable AI model for analysis.
+---
+
+### Vision Analysis
+
+#### `vision/analyze`
+
+Send images to vision-capable AI models for analysis.
 
 **Input:**
 ```json
 {
   "images": ["base64_encoded_image_or_data_url"],
   "prompt": "What do you see in this image?",
-  "model": "claude-haiku" // Optional: defaults to claude-haiku
+  "model": "claude-haiku"
 }
 ```
 
+**Parameters:**
+- `images` (string[], required) — Array of base64-encoded images or data URLs
+- `prompt` (string, required) — Question or instruction about the images
+- `model` (enum: `"claude-haiku"` | `"claude-sonnet"` | `"kimi-k2.5"`, optional) — Model to use
+
 **Models:**
-- `claude-haiku` (default): Fast, efficient
-- `claude-sonnet`: More capable, slower
-- `kimi-k2.5`: Via Ollama (requires `OLLAMA_HOST`)
+- `claude-haiku` (default) — Fast, efficient
+- `claude-sonnet` — More capable, slower
+- `kimi-k2.5` — Via Ollama (requires `OLLAMA_HOST`)
 
 **Examples:**
 
@@ -251,50 +227,458 @@ Compare two images:
 }
 ```
 
-Identify objects:
-```json
-{
-  "images": ["base64_image"],
-  "prompt": "What objects are visible in this image?"
-}
-```
-
-### File Operations
-
-- **`file/read`** — Read files with optional offset/limit for large files
-- **`file/write`** — Write files with optional directory creation
-- **`file/list`** — List directories with recursive and glob filtering
-- **`file/search`** — Search file contents using ripgrep/grep
-
-### Code & Git
-
-- **`code/search`** — Find files by glob pattern (e.g., `**/*.ts`)
-- **`git/status`** — Repository status with staged/unstaged counts
-- **`git/diff`** — Show working tree or staged changes
-- **`git/log`** — Commit history with filtering by author/date
-
-### Execution
-
-- **`shell/exec`** — Run shell commands with safety guards (blocks sudo, warns on rm -rf)
-- **`web/fetch`** — HTTP requests with response limiting
+---
 
 ### Document Creation
 
-- **`pdf/create`** — Create PDFs with headings, paragraphs, lists, tables
-- **`docx/create`** — Create Word documents (.docx)
-- **`xlsx/create`** — Create Excel spreadsheets from structured data
-- **`markdown/convert`** — Convert Markdown to PDF/DOCX/HTML/text
-- **`presentation/create`** — Create HTML presentations with keyboard navigation
+#### `pdf/create`
+
+Create PDF documents from structured content.
+
+**Input:**
+```json
+{
+  "title": "Quarterly Report",
+  "content": [
+    { "type": "heading", "level": 1, "text": "Executive Summary" },
+    { "type": "paragraph", "text": "This quarter showed significant growth..." },
+    { "type": "list", "items": ["Revenue up 25%", "New customers: 1,200"], "ordered": false }
+  ],
+  "options": {
+    "pageSize": "Letter",
+    "fontSize": 11
+  }
+}
+```
+
+**Content block types:**
+- `heading` — `level: 1 | 2 | 3`, `text: string`
+- `paragraph` — `text: string`
+- `list` — `items: string[]`, `ordered?: boolean`
+- `table` — `headers: string[]`, `rows: string[][]`
+- `pagebreak` — Start a new page
+
+**Output:** Base64-encoded PDF data with filename and page count.
+
+---
+
+#### `docx/create`
+
+Create Microsoft Word documents.
+
+**Input:**
+```json
+{
+  "title": "Project Proposal",
+  "content": [
+    { "type": "heading", "level": 1, "text": "Overview" },
+    { "type": "paragraph", "text": "This document outlines..." }
+  ],
+  "metadata": {
+    "author": "Jane Doe",
+    "subject": "Q4 Project Proposal",
+    "keywords": ["project", "proposal", "Q4"]
+  }
+}
+```
+
+**Output:** Base64-encoded DOCX data with filename.
+
+---
+
+#### `xlsx/create`
+
+Create Excel spreadsheets from structured data.
+
+**Input:**
+```json
+{
+  "sheets": [
+    {
+      "name": "Sales Data",
+      "headers": ["Product", "Q1", "Q2", "Q3", "Q4"],
+      "data": [
+        { "Product": "Widget A", "Q1": 1000, "Q2": 1200, "Q3": 1100, "Q4": 1400 },
+        { "Product": "Widget B", "Q1": 800, "Q2": 900, "Q3": 950, "Q4": 1000 }
+      ]
+    }
+  ],
+  "options": {
+    "creator": "Sales Team",
+    "company": "Acme Corp"
+  }
+}
+```
+
+**Output:** Base64-encoded XLSX data with filename, sheet count, and row count.
+
+---
+
+#### `markdown/convert`
+
+Convert Markdown to various document formats.
+
+**Input:**
+```json
+{
+  "markdown": "# Hello World\n\nThis is a **test** document.",
+  "format": "pdf",
+  "title": "My Document"
+}
+```
+
+**Formats:** `pdf`, `docx`, `html`, `text`
+
+**Supported Markdown:**
+- Headings (`#` to `######`)
+- Paragraphs
+- Lists (ordered and unordered)
+- Code blocks (fenced with ```)
+- Blockquotes (`>`)
+- Horizontal rules (`---`, `===`, `***`)
+
+---
+
+#### `presentation/create`
+
+Create HTML presentations (slide decks).
+
+**Input:**
+```json
+{
+  "title": "Product Launch",
+  "slides": [
+    { "type": "title", "title": "New Product Launch" },
+    { "type": "section", "title": "Market Analysis" },
+    { "type": "content", "title": "Key Features", "content": ["Feature 1", "Feature 2", "Feature 3"] }
+  ],
+  "theme": "corporate",
+  "options": {
+    "includeProgressBar": true,
+    "includeSlideNumbers": true,
+    "aspectRatio": "16:9"
+  }
+}
+```
+
+**Slide types:**
+- `title` — Title slide with centered text
+- `section` — Section divider slide
+- `content` — Content slide with bullet list
+- `image` — Image slide with optional title
+
+**Themes:** `default`, `dark`, `minimal`, `corporate`
+
+**Features:**
+- Keyboard navigation (arrow keys, space)
+- Progress bar
+- Slide numbers
+- Print-friendly CSS
+- Responsive design
+
+---
+
+### File System Operations
+
+#### `file/read`
+
+Read file contents with optional offset/limit for large files.
+
+**Input:**
+```json
+{
+  "path": "/path/to/file.ts",
+  "offset": 1,
+  "limit": 50
+}
+```
+
+**Security:** Can only read files within the working directory.
+
+---
+
+#### `file/write`
+
+Write content to files.
+
+**Input:**
+```json
+{
+  "path": "/path/to/output.txt",
+  "content": "Hello, World!",
+  "createDirs": true,
+  "append": false
+}
+```
+
+**Security:** Can only write files within the working directory.
+
+---
+
+#### `file/list`
+
+List directory contents with optional recursive and glob filtering.
+
+**Input:**
+```json
+{
+  "path": "./src",
+  "pattern": "*.ts",
+  "recursive": true
+}
+```
+
+**Output:** Array of file entries with name, path, type, size, and modification time.
+
+---
+
+#### `file/search`
+
+Search file contents using ripgrep (falls back to grep).
+
+**Input:**
+```json
+{
+  "pattern": "function.*test",
+  "path": "./src",
+  "glob": "*.ts",
+  "caseSensitive": false,
+  "context": 2
+}
+```
+
+**Output:** Array of matches with file path, line number, column, and context lines.
+
+---
+
+### Code & Git
+
+#### `code/search`
+
+Find files by glob pattern.
+
+**Input:**
+```json
+{
+  "pattern": "**/*.tsx",
+  "path": "./src",
+  "exclude": ["node_modules/**", "*.test.tsx"]
+}
+```
+
+**Output:** Array of matching file paths, sorted by modification time (newest first).
+
+---
+
+#### `git/status`
+
+Get git repository status.
+
+**Input:**
+```json
+{
+  "path": "./my-repo"
+}
+```
+
+**Output:**
+```json
+{
+  "branch": "main",
+  "ahead": 2,
+  "behind": 0,
+  "staged": [],
+  "unstaged": [],
+  "untracked": ["new-file.txt"],
+  "isClean": false
+}
+```
+
+---
+
+#### `git/diff`
+
+Show git diff of changes.
+
+**Input:**
+```json
+{
+  "path": "./my-repo",
+  "cached": false,
+  "target": "HEAD~1",
+  "file": "src/index.ts"
+}
+```
+
+---
+
+#### `git/log`
+
+Get commit history.
+
+**Input:**
+```json
+{
+  "path": "./my-repo",
+  "n": 10,
+  "author": "john",
+  "since": "1 week ago"
+}
+```
+
+---
+
+### Execution & Web
+
+#### `shell/exec`
+
+Execute shell commands with safety guards.
+
+**Input:**
+```json
+{
+  "command": "npm run build",
+  "cwd": "./my-project",
+  "timeout": 60000,
+  "env": { "NODE_ENV": "production" }
+}
+```
+
+**Safety features:**
+- Blocks `sudo` commands
+- Warns on `rm -rf`
+- 30-second default timeout (configurable)
+- 100KB output limit
+
+**Output:**
+```json
+{
+  "stdout": "build output...",
+  "stderr": "",
+  "exitCode": 0,
+  "truncated": false
+}
+```
+
+---
+
+#### `web/fetch`
+
+Fetch web content.
+
+**Input:**
+```json
+{
+  "url": "https://api.example.com/data",
+  "method": "GET",
+  "headers": { "Authorization": "Bearer token" },
+  "maxLength": 50000
+}
+```
+
+**Output:** Response status, headers, and content (truncated if over limit).
+
+---
+
+#### `system/ask`
+
+Request interactive user input (requires client support).
+
+**Input:**
+```json
+{
+  "question": "Which file should I edit?",
+  "options": ["index.ts", "server.ts", "utils.ts"]
+}
+```
+
+**Note:** This tool requires MCP client support for interactive prompts. In Claude Code, use `AskUserQuestion` instead.
+
+---
 
 ## Chaining Tools
 
 The real power comes from chaining tools together:
 
-**Example workflow:**
-1. Convert PDF to images with `document/convert`
-2. Analyze those images with `vision/analyze`
+### Example 1: Document Processing Pipeline
 
-This allows any model to "read" PDF documents visually, even if the model doesn't have native PDF support.
+1. Convert PDF to images: `document/convert`
+2. Analyze those images: `vision/analyze`
+3. Create a summary document: `pdf/create`
+
+### Example 2: Code Analysis
+
+1. Search for test files: `code/search`
+2. Read test content: `file/read`
+3. Run tests: `shell/exec`
+4. Create report: `markdown/convert`
+
+### Example 3: Git Workflow
+
+1. Check git status: `git/status`
+2. View recent commits: `git/log`
+3. Show current diff: `git/diff`
+4. Create changelog: `docx/create`
+
+---
+
+## Architecture
+
+### Tool Registry
+
+Tools are modular and self-contained in `src/tools/`:
+
+```
+src/tools/
+├── index.ts                 # Central registry
+├── documentConvert.ts       # PDF/DOCX/XLSX reading
+├── visionAnalyze.ts         # Claude/Kimi vision
+├── pdfCreate.ts            # PDF generation
+├── docxCreate.ts           # Word generation
+├── xlsxCreate.ts           # Excel generation
+├── markdownToDocument.ts   # Markdown conversion
+├── presentationCreate.ts    # HTML presentations
+├── fileRead.ts             # File reading
+├── fileWrite.ts            # File writing
+├── fileList.ts             # Directory listing
+├── fileSearch.ts           # Content search
+├── codeSearch.ts           # Glob patterns
+├── gitStatus.ts            # Git status
+├── gitDiff.ts              # Git diff
+├── gitLog.ts               # Git log
+├── shellExec.ts            # Shell execution
+├── webFetch.ts             # HTTP requests
+└── systemAsk.ts            # User prompts
+```
+
+### Adding a New Tool
+
+1. Create `src/tools/myTool.ts` with schema and handler
+2. Export schema and handler from `src/tools/index.ts`
+3. Add to `toolDefinitions` and `toolHandlers` arrays
+
+Example:
+
+```typescript
+// src/tools/myTool.ts
+export const myToolSchema = {
+  name: "my/tool",
+  description: "Does something useful",
+  inputSchema: {
+    type: "object",
+    properties: {
+      input: { type: "string" }
+    },
+    required: ["input"]
+  }
+};
+
+export async function myTool(input: { input: string }) {
+  return { result: `Processed: ${input.input}` };
+}
+```
+
+---
 
 ## Development
 
@@ -305,14 +689,26 @@ npm install
 # Build
 npm run build
 
+# Watch mode
+npm run dev
+
 # Run locally
-export ANTHROPIC_API_KEY=your_key
 node ./dist/index.js
 ```
+
+### Requirements
+
+- Node.js >= 20
+- Native build dependencies for `canvas` and `pdfkit` (see Dockerfile for Alpine packages)
+- Optional: `git`, `ripgrep` (rg) for enhanced search
+
+---
 
 ## License
 
 MIT — See [LICENSE](./LICENSE)
+
+---
 
 ## Contributing
 
