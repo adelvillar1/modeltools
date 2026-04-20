@@ -1,0 +1,46 @@
+{
+  "name": "@adelvillar/document-vision-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for document conversion and vision analysis — works with any model that supports tools",
+  "license": "MIT",
+  "author": "adelvillar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adelvillar/document-vision-mcp.git"
+  },
+  "type": "module",
+  "bin": {
+    "document-vision-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "canvas": "^3.0.0",
+    "docx": "^8.5.0",
+    "glob": "^10.0.0",
+    "mammoth": "^1.9.0",
+    "ollama": "^0.5.0",
+    "pdfjs-dist": "^4.8.0",
+    "pdfkit": "^0.15.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/node": "^20.0.0",
+    "@types/pdfkit": "^0.13.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
